@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package pkg2048;
+package grid;
 
-import java.awt.Graphics;
+import tile.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -107,7 +107,7 @@ public class Grid {
         Collections.shuffle(availableSpace);
         return availableSpace;
     }
-    protected void addTile(){
+    public void addTile(){
         myGrid[(int)availableSpace().get(0)].setValue(2);
     }   
     private void moveGrid(){
