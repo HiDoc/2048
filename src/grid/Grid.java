@@ -65,9 +65,12 @@ public class Grid {
     }
     
     protected Tile[] removeSpace(Tile[] LineTile){
-        for (int i = 0; i < LineTile.length - 1; i++) {
-            if (LineTile[i].isNull()) {
-                LineTile[i].setValue(LineTile[i+1].getValue());
+        for (int j = 0; j < 3; j++) {
+            for (int i = 0; i < LineTile.length - 1; i++) {
+                if (LineTile[i].isNull()) {
+                    LineTile[i].setValue(LineTile[i + 1].getValue());
+                    LineTile[i + 1].setValue(0);
+                }
             }
         }
         return LineTile;
@@ -113,6 +116,7 @@ public class Grid {
     private void moveGrid(){
         for (int i = 1; i <= this.row; i++) {
             mergeLine(myGrid, removeSpace(mergeTile(removeSpace(extractLine(myGrid, i)))));
+            
         }
     }
     public void direction(int directionValue){
@@ -153,5 +157,13 @@ public class Grid {
     }
     public Tile getTile(int number){
         return this.myGrid[number];
+    }
+    public void showLog(){
+        for (int i = 1; i <= 16; i++) {
+            if((i%4) != 0)   
+            System.out.print(Integer.toString(myGrid[i - 1].getValue()));
+            else 
+            System.out.println(Integer.toString(myGrid[i - 1].getValue()));
+        }
     }
 }
