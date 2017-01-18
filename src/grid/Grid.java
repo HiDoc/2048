@@ -151,4 +151,7 @@ public class Grid {
     public Tile[] getGrid(){
         return this.myGrid;
     }
+    public Tile getTile(int number){
+        return this.myGrid[number];
+    }
 }

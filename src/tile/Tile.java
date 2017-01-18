@@ -46,4 +46,8 @@ public class Tile {
     public boolean sameValue(Tile compareTile){
         return this.value == compareTile.getValue();
     }
+    @Override
+    public String toString(){
+        return Integer.toString(this.value);
+    }
 }

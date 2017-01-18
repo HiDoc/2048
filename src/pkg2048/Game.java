@@ -5,14 +5,16 @@
  */
 package pkg2048;
 import grid.*;
+import java.awt.GridLayout;
 /**
  *
  * @author Flo
  */
-import javax.swing.JPanel;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import javax.swing.*;
 public class Game extends JPanel {
+    public JFrame GL = new JFrame();
     private Grid myGrid = new Grid();
     public final static int LEFT = 0;
     public final static int UP = 1;
@@ -22,13 +24,27 @@ public class Game extends JPanel {
     public final static int WIN = 2;    
     public final static int LOOSE = 1;    
     
-    public Game(){
+    public Game(){     
+        settings(GL);
         myGrid.addTile();
         myGrid.addTile();
         launchGame();
+        fillGrid();
+        GL.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+    private void settings(JFrame f){
+        f.setVisible(true);
+        f.setFocusable(true);
+        f.setTitle("2048");
+        f.setSize(600, 600);
+        f.setLayout(new GridLayout(4,4));
+    }
+    private void fillGrid(){
+        for (int i = 0; i < 16; i++) {
+            GL.add(new JLabel((myGrid.getTile(i).toString())));
+        }
     }
     private void launchGame(){
-        setFocusable(true);
         addKeyListener(new KeyAdapter() {
             private Grid myGrid;
             @Override
@@ -73,6 +89,7 @@ public class Game extends JPanel {
                 errorMessage();
                 break;
         }
+        fillGrid();
     }
     private String winMessage(){
         return "Vous avez gagné !";
