@@ -7,7 +7,6 @@ package grid;
 
 import tile.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -16,7 +15,7 @@ import java.util.Collections;
  */
 public class Grid {
     final Tile[] myGrid;
-    private Tile[] lastGrid;
+    final Tile[] lastGrid;
     final int col;
     final int row;
     
@@ -44,8 +43,8 @@ public class Grid {
     }
     
     private Tile[] mergeLine(Tile[] myGrid,Tile[] LineTile){
-        for (int i = 0; i < LineTile.length; i++) {
-            myGrid[getArrayIndex(LineTile[i])].setValue(LineTile[i].getValue());
+        for (Tile LineTile1 : LineTile) {
+            myGrid[getArrayIndex(LineTile1)].setValue(LineTile1.getValue());
         }
         return myGrid;
     }
@@ -63,7 +62,6 @@ public class Grid {
     private int getArrayIndex(int abs, int ord){
         return ( abs - 1 ) + (ord - 1) * this.col ; 
     }
-    
     protected Tile[] removeSpace(Tile[] LineTile){
         for (int j = 0; j < 3; j++) {
             for (int i = 0; i < LineTile.length - 1; i++) {
@@ -91,6 +89,21 @@ public class Grid {
             int tmp;
             for (int i=0; i<n/2; i++){
                 for (int j=i; j<n-i-1; j++){
+                        tmp = this.myGrid[getArrayIndex(i+1,j+1)].getValue();
+                        this.myGrid[getArrayIndex(i+1,j+1)].setValue(this.myGrid[getArrayIndex(j+1,n-i)].getValue());
+                        this.myGrid[getArrayIndex(j+1,n-i)].setValue(this.myGrid[getArrayIndex(n-i,n-j)].getValue());
+                        this.myGrid[getArrayIndex(n-i,n-j)].setValue(this.myGrid[getArrayIndex(n-j,i+1)].getValue());
+                        this.myGrid[getArrayIndex(n-j,i+1)].setValue(tmp);
+                }
+            }
+        }
+    }
+    protected void rotateGrid(int numberOfRotation, Tile[] myGrid){
+        for (int a = 0; a < numberOfRotation; a++) {
+            int n=this.row;
+            int tmp;
+            for (int i=0; i<n/2; i++){
+                for (int j=i; j<n-i-1; j++){
                         tmp = myGrid[getArrayIndex(i+1,j+1)].getValue();
                         myGrid[getArrayIndex(i+1,j+1)].setValue(myGrid[getArrayIndex(j+1,n-i)].getValue());
                         myGrid[getArrayIndex(j+1,n-i)].setValue(myGrid[getArrayIndex(n-i,n-j)].getValue());
@@ -110,24 +123,44 @@ public class Grid {
         Collections.shuffle(availableSpace);
         return availableSpace;
     }
+    private boolean availableSpace(Tile[] mGrid) {
+        ArrayList<Integer> availableSpace = new ArrayList<>();
+        for (int i = 0; i < mGrid.length; i++) {
+            if (mGrid[i].isNull()) {
+                availableSpace.add(i);
+            }
+        }
+        return availableSpace.isEmpty();
+    }
     public void addTile(){
         myGrid[(int)availableSpace().get(0)].setValue(2);
     }   
     private void moveGrid(){
         for (int i = 1; i <= this.row; i++) {
             mergeLine(myGrid, removeSpace(mergeTile(removeSpace(extractLine(myGrid, i)))));
-            
+        }
+    }
+    private void moveGrid(Tile[] mGrid){
+        for (int i = 1; i <= this.row; i++) {
+            mergeLine(mGrid, removeSpace(mergeTile(removeSpace(extractLine(mGrid, i)))));
         }
     }
     public void direction(int directionValue){
+        setLastGrid();
         rotateGrid(directionValue);
         moveGrid();
         rotateGrid(4 - directionValue);
     }
+    private Tile[] direction(int directionValue, Tile[] mGrid){
+        rotateGrid(directionValue, mGrid);
+        moveGrid(mGrid);
+        rotateGrid(4 - directionValue);
+        return mGrid;
+    }
     public boolean winGame(){
         boolean win = false;
-        for (int i = 0; i < myGrid.length; i++) {
-            if (myGrid[i].getValue() == 2048) {
+        for (Tile myGrid1 : myGrid) {
+            if (myGrid1.getValue() == 2048) {
                 win = true;
             }
         }
@@ -135,13 +168,42 @@ public class Grid {
     }
     public boolean looseGame(){
         boolean loose = false;
-        if (availableSpace().isEmpty() && !Arrays.equals(myGrid, lastGrid)) {
+        if (availableSpace().isEmpty() && !canMove() && tryMerge(shadowGrid())) {
             loose = true;
         }
         return loose;
     }
     public void setLastGrid(){
-        this.lastGrid = myGrid.clone();
+        for (int i = 0; i < myGrid.length; i++) {
+            lastGrid[i].setValue(myGrid[i].getValue());
+        }
+    }
+    public Tile[] shadowGrid(){
+        Tile[] newGrid = initialiseGrid();
+        for (int i = 0; i < myGrid.length; i++) {
+            newGrid[i].setValue(myGrid[i].getValue());
+        }
+        return newGrid;
+    }
+    public boolean canMove(){
+        int same = 0;
+        for (int i = 0; i < myGrid.length; i++) {
+            if (myGrid[i].getValue() == lastGrid[i].getValue())
+                same++;
+        }
+        return same < 16;
+   }
+    private boolean tryMerge(Tile[] mGrid){
+        int possible = 0;
+        for (int i = 0; i < 4; i++) {
+            if (!availableSpace(direction(i,mGrid))) {
+                possible++;
+            }
+        }
+        return possible == 0;
+    }
+    public boolean mergePossible(){
+        return !tryMerge(shadowGrid());
     }
     public int getCol(){
      return this.col;   
@@ -159,11 +221,19 @@ public class Grid {
         return this.myGrid[number];
     }
     public void showLog(){
+        System.out.println("\n");
         for (int i = 1; i <= 16; i++) {
             if((i%4) != 0)   
             System.out.print(Integer.toString(myGrid[i - 1].getValue()));
             else 
             System.out.println(Integer.toString(myGrid[i - 1].getValue()));
+        }
+        System.out.println("\n");
+        for (int i = 1; i <= 16; i++) {
+            if((i%4) != 0)   
+            System.out.print(Integer.toString(lastGrid[i - 1].getValue()));
+            else 
+            System.out.println(Integer.toString(lastGrid[i - 1].getValue()));
         }
     }
 }
