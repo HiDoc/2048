@@ -73,7 +73,12 @@ public final class Game extends JPanel implements KeyListener {
         switch (checkGame()) {
             case CONTINUE:
                 if (myGrid.canMove()){
+                    try {
                     myGrid.addTile();
+                    }
+                    catch(Exception e){
+                        
+                    }
                     myGrid.showLog();
                 }
                 break;
