@@ -5,9 +5,6 @@
  */
 package pkg2048;
 
-import java.awt.*;
-import javax.swing.*;
-
 /**
  *
  * @author Flo

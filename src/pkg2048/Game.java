@@ -58,7 +58,10 @@ public final class Game extends JPanel implements KeyListener {
     }
     private void fillGrid(){
         for (int i = 0; i < 16; i++) {
-            JLabel New = new JLabel((myGrid.getTile(i).toString()),JLabel.CENTER);
+            String value = "";
+            if(myGrid.getTile(i).getValue() != 0)
+                value = (myGrid.getTile(i).toString());
+            JLabel New = new JLabel((value),JLabel.CENTER);
             New.setOpaque(true);
             New.setBackground(ColorBG((myGrid.getTile(i).getValue())));
             this.GL.add(New);

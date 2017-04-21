@@ -202,9 +202,6 @@ public class Grid {
         }
         return possible == 0;
     }
-    public boolean mergePossible(){
-        return !tryMerge(shadowGrid());
-    }
     public int getCol(){
      return this.col;   
     }
